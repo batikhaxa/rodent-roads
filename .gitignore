@@ -1,2 +1,9 @@
 data/
 *.csproj
+.refasm/
+bin/
+obj/
+.vscode/
+
+# this is just: https://github.com/Paprotk/ts3buildtool
+ts3buildtool/ 

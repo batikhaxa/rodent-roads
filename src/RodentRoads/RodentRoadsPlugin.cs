@@ -1,16 +1,12 @@
-using MonoPatcherLib;
-using Sims3.Gameplay.Abstracts;
-using Sims3.Gameplay.Actors;
-using Sims3.Gameplay.Objects.MinorPets;
+using MonoPatcherLib;                       // [Plugin], MonoPatcher, [ReplaceMethod]
+using Sims3.Gameplay.Abstracts;             // MinorPet
+using Sims3.Gameplay.Actors;                // Sim
+using Sims3.Gameplay.Objects.MinorPets;     // MinorPetRodent
+
 
 namespace RodentRoads
 {
-    /// <summary>
-    /// This patches <see cref="MinorPet.SimulateBehavior"/>.
-    /// </summary>
-    /// <remarks>
-    /// Requires the MonoPatcher script mod to be installed in the game.
-    /// </remarks>
+    /// <summary>Patches <see cref="MinorPet.SimulateBehavior"/>; requires MonoPatcher.</summary>
     [Plugin]
     public class RodentRoadsPlugin
     {
@@ -20,13 +16,12 @@ namespace RodentRoads
         }
 
         /// <summary>
-        /// Replaces the private <c>MinorPet.SimulateBehavior</c> dispatcher, which the pet's own
-        /// <c>Simulate()</c> loop calls every <c>MinorPetTuning.BehaviorAlarmCallbackFrequency</c>
-        /// (default 5) Sim minutes.
+        /// Replacement for <c>MinorPet.SimulateBehavior</c>, called every
+        /// <c>MinorPetTuning.BehaviorAlarmCallbackFrequency</c> Sim minutes.
         /// </summary>
         /// <remarks>
-        /// A replacement swaps the whole body, so the original dispatch below is reproduced using only
-        /// public members. Keep it in sync with the decompiled source (data/decompiled/MinorPet.cs).
+        /// MonoPatcher swaps the whole body, so the original dispatch is reproduced below
+        /// and must match data/decompiled/MinorPet.cs.
         /// </remarks>
         [ReplaceMethod(typeof(MinorPet), "SimulateBehavior")]
         private void SimulateBehavior_Replacement()
@@ -37,10 +32,15 @@ namespace RodentRoads
                 return;
             }
 
-            // New hook.
+            // Above the guards on purpose: an in-progress trip must keep ticking while the
+            // rodent is out of its cage. Dead pets are handled inside the runtime.
             if (pet is MinorPetRodent)
             {
-                RodentRoadsRuntime.OnTick(pet);
+                if (RodentRoadsRuntime.OnTick(pet))
+                {
+                    // Parked in an inventory: the dispatch below does not apply to it.
+                    return;
+                }
             }
 
             // -------------- Original clauses --------------
