@@ -1,0 +1,21 @@
+<resources>
+    <!--
+      Input for ts3buildtool (see ts3buildtool/README.md and tools/build.ps1).
+
+      S3SA = the managed script assembly. The tool embeds the DLL given by -dllPath
+      and keys it on FNV64(name), so the name is what s3pe shows in the resource
+      name map. MonoPatcher finds plugins by scanning the assemblies the game has
+      loaded for [Plugin] types (MonoPatcher.cs:200-211), so the instance value is
+      cosmetic - it just has to stay stable so s3pe/replacements match up.
+
+      Convention is the fully qualified entry class name.
+      (The first hand-rolled prototype used "RodentRoads.dll" here instead.)
+    -->
+    <resource name="RodentRoads.RodentRoadsPlugin" type="0x073FAA07" />
+
+    <!--
+      Later, when tuning/strings exist, add them here, e.g.:
+        <resource name="RodentRoadsTuning" type="0x0333406C" />   XML tuning
+        <resource name="*.stbl" type="0x220557DA" />              string tables
+    -->
+</resources>
